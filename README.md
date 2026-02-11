@@ -30,7 +30,7 @@ It automates the complete AWS infrastructure lifecycle:
 
 ## 🏗 Architecture Overview
 
-![Terraform Jenkins Pipeline Tech-Stack](image.svg)
+![Terraform Jenkins Pipeline Tech-Stack](image.png)
 
 `Terraform-Jenkins-Animated-Pipeline.svg`
 
