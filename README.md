@@ -1,109 +1,213 @@
-# 🚀 Terraform + Jenkins Enterprise Pipeline (Dynamic Badges)
+# 🚀 Enterprise Infrastructure Automation
 
-![Build
-Status](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge&logo=jenkins)
-![Terraform](https://img.shields.io/badge/Terraform-v1.14-623CE4?style=for-the-badge&logo=terraform)
-![AWS](https://img.shields.io/badge/AWS-EKS%20Cluster-FF9900?style=for-the-badge&logo=amazonaws)
-![Pipeline](https://img.shields.io/badge/Pipeline-Enterprise-blue?style=for-the-badge)
-![Last
-Commit](https://img.shields.io/github/last-commit/your-org/your-repo?style=for-the-badge)
-![Repo
-Size](https://img.shields.io/github/repo-size/your-org/your-repo?style=for-the-badge)
-![Stars](https://img.shields.io/github/stars/your-org/your-repo?style=for-the-badge)
+## Terraform + Jenkins CI/CD Pipeline on AWS
 
-------------------------------------------------------------------------
+```{=html}
+<p align="center">
+```
+`<img src="https://img.shields.io/badge/Terraform-v1.14+-623CE4?style=for-the-badge&logo=terraform&logoColor=white"/>`{=html}
+`<img src="https://img.shields.io/badge/Jenkins-Pipeline-D24939?style=for-the-badge&logo=jenkins&logoColor=white"/>`{=html}
+`<img src="https://img.shields.io/badge/AWS-EKS%20%7C%20VPC-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white"/>`{=html}
+`<img src="https://img.shields.io/badge/Infrastructure-as--Code-Enterprise-blue?style=for-the-badge"/>`{=html}
 
-## 📊 Live Counters
-
-![Workflow
-Runs](https://img.shields.io/github/actions/workflow/status/your-org/your-repo/ci.yml?style=for-the-badge)
-![Issues](https://img.shields.io/github/issues/your-org/your-repo?style=for-the-badge)
-![Pull
-Requests](https://img.shields.io/github/issues-pr/your-org/your-repo?style=for-the-badge)
+```{=html}
+</p>
+```
 
 ------------------------------------------------------------------------
 
-## 🏗 Dynamic CI/CD Architecture
+# 📌 Project Overview
 
-Developer → GitHub → Jenkins → Terraform → AWS (VPC + EKS)
+This project demonstrates a **production-grade Infrastructure Automation
+pipeline** using:
 
-
-------------------------------------------------------------------------
-
-## 🧠 Project Overview
-
-This project demonstrates a production-style Infrastructure-as-Code
-(IaC) CI/CD pipeline using:
-
--   Terraform for AWS infrastructure provisioning
--   Jenkins Declarative Pipeline for automation
--   Secure credential management
--   Parameterized Apply / Destroy execution
--   Manual approval gates
--   Amazon EKS cluster provisioning
+-   Terraform for Infrastructure as Code\
+-   Jenkins Declarative Pipeline for CI/CD orchestration\
+-   AWS as the cloud provider\
+-   EKS + VPC + IAM + Security Groups + NAT Gateway provisioning\
+-   Manual approval gates & controlled apply/destroy flows
 
 ------------------------------------------------------------------------
 
-## 🏗 Architecture Workflow
+# 🏗️ Architecture Overview
 
-Developer → GitHub → Jenkins → Terraform Init → Validate → Plan →
-Approval → Apply/Destroy → AWS (VPC + EKS)
+## 🔷 High-Level Flow
 
-------------------------------------------------------------------------
-
-## ⚙️ What This Project Does
-
-✔ Automates Terraform execution via Jenkins\
-✔ Provisions AWS networking stack (VPC, Subnets, NAT, IGW)\
-✔ Deploys Amazon EKS cluster\
-✔ Implements approval workflow before infrastructure changes\
-✔ Supports controlled infrastructure destruction\
-✔ Secures AWS credentials using Jenkins credential store\
-✔ Archives Terraform plan artifacts
+Developer → GitHub → Jenkins → Terraform → AWS (VPC, IAM, EKS, Security)
 
 ------------------------------------------------------------------------
 
-## 📦 Infrastructure Components
+# 🔁 End-to-End Workflow
 
--   VPC
--   Public & Private Subnets
--   NAT Gateway
--   Route Tables
--   Security Groups
--   IAM Roles & Policies
--   KMS Encryption
--   Amazon EKS Cluster
--   Managed Node Group
-
-------------------------------------------------------------------------
-
-## 🔄 Pipeline Capabilities
-
-  Feature              Status
-  -------------------- --------
-  Terraform Init       ✅
-  Terraform Validate   ✅
-  Terraform Plan       ✅
-  Manual Approval      ✅
-  Apply                ✅
-  Destroy              ✅
-  Secure Credentials   ✅
-  Artifact Archiving   ✅
+1.  Developer pushes Terraform code to GitHub\
+2.  Jenkins pulls repository\
+3.  Terraform initializes providers & modules\
+4.  Terraform validates configuration\
+5.  Terraform generates execution plan\
+6.  Manual approval (if required)\
+7.  Apply or Destroy executed\
+8.  Status archived & reported
 
 ------------------------------------------------------------------------
 
-## 🛠 Tech Stack
+# ⚙️ Jenkins Pipeline
 
-Terraform • Jenkins • AWS • Amazon EKS • GitHub • Amazon Linux
+``` groovy
+pipeline {
+
+    agent any
+
+    parameters {
+        choice(name: 'action', choices: ['apply', 'destroy'], description: 'Select Terraform action')
+        booleanParam(name: 'autoApprove', defaultValue: false, description: 'Skip manual approval?')
+    }
+
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+    }
+
+    options {
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                cleanWs()
+                checkout scm
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh 'terraform init -input=false'
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                sh 'terraform validate'
+            }
+        }
+
+        stage('Terraform Plan') {
+            when {
+                expression { params.action == 'apply' }
+            }
+            steps {
+                sh 'terraform plan -out=tfplan'
+                sh 'terraform show -no-color tfplan > tfplan.txt'
+            }
+        }
+
+        stage('Approval') {
+            when {
+                allOf {
+                    expression { params.action == 'apply' }
+                    expression { !params.autoApprove }
+                }
+            }
+            steps {
+                script {
+                    def plan = readFile 'tfplan.txt'
+                    input message: "Approve Terraform Plan?",
+                          parameters: [text(name: 'Plan', defaultValue: plan)]
+                }
+            }
+        }
+
+        stage('Apply / Destroy') {
+            steps {
+                script {
+                    if (params.action == 'apply') {
+                        sh 'terraform apply -input=false tfplan'
+                    } else if (params.action == 'destroy') {
+                        sh 'terraform destroy --auto-approve'
+                    } else {
+                        error "Invalid action selected."
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Infrastructure operation completed successfully."
+        }
+        failure {
+            echo "❌ Terraform deployment failed."
+        }
+    }
+}
+```
 
 ------------------------------------------------------------------------
 
-## 👨‍💻 Author
+# ☁️ AWS Infrastructure Provisioned
 
-Avik Kumar Banerjee\
-Cloud / DevOps Engineer\
-AWS \| Terraform \| Jenkins \| Kubernetes \| CI/CD
+-   VPC\
+-   Public & Private Subnets\
+-   NAT Gateway\
+-   IAM Roles & Policies\
+-   Security Groups\
+-   KMS Encryption\
+-   EKS Cluster
 
 ------------------------------------------------------------------------
 
-⭐ Enterprise-ready Infrastructure Automation Pipeline
+# 🔐 Security Best Practices
+
+-   Credentials stored in Jenkins\
+-   No secrets in GitHub\
+-   Manual approval gate\
+-   Controlled destroy capability\
+-   Terraform state locking\
+-   Provider version constraints
+
+------------------------------------------------------------------------
+
+# 📊 CI/CD Maturity Alignment
+
+✔ Infrastructure as Code\
+✔ Automated Plan\
+✔ Manual Governance Gate\
+✔ Automated Apply\
+✔ Controlled Destroy\
+✔ Modular Architecture
+
+------------------------------------------------------------------------
+
+# 🚀 Key Achievements
+
+-   Designed enterprise Terraform pipeline\
+-   Provisioned AWS EKS environment\
+-   Implemented approval governance\
+-   Automated full infrastructure lifecycle
+
+------------------------------------------------------------------------
+
+# 👨‍💻 Author
+
+Avik Banerjee\
+Cloud \| DevOps \| Infrastructure Automation Engineer
+
+------------------------------------------------------------------------
+
+# 🔄 Animated CI/CD Pipeline Visualization
+
+Below is the fully animated Terraform + Jenkins pipeline diagram:
+
+![Animated Terraform Jenkins
+Pipeline](Terraform-Jenkins-Animated-Pipeline.svg)
+
+> ⚙️ This SVG includes animated flow arrows and enterprise workflow
+> visualization.
+>
+> Recommended: Keep the SVG file in the same repository root for proper
+> rendering on GitHub.
+
+------------------------------------------------------------------------
