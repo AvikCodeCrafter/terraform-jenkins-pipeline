@@ -1,213 +1,112 @@
 # 🚀 Enterprise Infrastructure Automation
 
-## Terraform + Jenkins CI/CD Pipeline on AWS
-
 ```{=html}
 <p align="center">
 ```
-`<img src="https://img.shields.io/badge/Terraform-v1.14+-623CE4?style=for-the-badge&logo=terraform&logoColor=white"/>`{=html}
+`<img src="https://img.shields.io/badge/Terraform-v1.14-623CE4?style=for-the-badge&logo=terraform&logoColor=white"/>`{=html}
 `<img src="https://img.shields.io/badge/Jenkins-Pipeline-D24939?style=for-the-badge&logo=jenkins&logoColor=white"/>`{=html}
 `<img src="https://img.shields.io/badge/AWS-EKS%20%7C%20VPC-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white"/>`{=html}
 `<img src="https://img.shields.io/badge/Infrastructure-as--Code-Enterprise-blue?style=for-the-badge"/>`{=html}
-
 ```{=html}
 </p>
 ```
 
 ------------------------------------------------------------------------
 
-# 📌 Project Overview
+## 📌 Project Overview
 
-This project demonstrates a **production-grade Infrastructure Automation
-pipeline** using:
+Enterprise-grade Infrastructure Automation pipeline using **Terraform +
+Jenkins** to provision and manage AWS infrastructure.
 
--   Terraform for Infrastructure as Code\
--   Jenkins Declarative Pipeline for CI/CD orchestration\
--   AWS as the cloud provider\
--   EKS + VPC + IAM + Security Groups + NAT Gateway provisioning\
--   Manual approval gates & controlled apply/destroy flows
+This project demonstrates:
 
-------------------------------------------------------------------------
-
-# 🏗️ Architecture Overview
-
-## 🔷 High-Level Flow
-
-Developer → GitHub → Jenkins → Terraform → AWS (VPC, IAM, EKS, Security)
+-   Modular Terraform architecture
+-   Secure AWS credential injection via Jenkins
+-   Automated `init → validate → plan`
+-   Manual approval gates
+-   Controlled `apply / destroy`
+-   Full infrastructure lifecycle automation
 
 ------------------------------------------------------------------------
 
-# 🔁 End-to-End Workflow
+## 🏗 Architecture Overview
 
-1.  Developer pushes Terraform code to GitHub\
-2.  Jenkins pulls repository\
-3.  Terraform initializes providers & modules\
-4.  Terraform validates configuration\
-5.  Terraform generates execution plan\
-6.  Manual approval (if required)\
-7.  Apply or Destroy executed\
-8.  Status archived & reported
+**Layers:**
+
+1.  **Source Control** -- GitHub repository
+2.  **CI/CD Engine** -- Jenkins Declarative Pipeline
+3.  **Infrastructure as Code** -- Terraform Modules
+4.  **Cloud Platform** -- AWS (VPC, EKS, IAM, Security Groups)
+5.  **State & Governance** -- Terraform state management + approval
+    workflow
 
 ------------------------------------------------------------------------
 
-# ⚙️ Jenkins Pipeline
+## 🔄 CI/CD Workflow
 
-``` groovy
-pipeline {
+### Stage 1 -- Checkout
 
-    agent any
+Jenkins pulls latest Terraform code from GitHub.
 
-    parameters {
-        choice(name: 'action', choices: ['apply', 'destroy'], description: 'Select Terraform action')
-        booleanParam(name: 'autoApprove', defaultValue: false, description: 'Skip manual approval?')
-    }
+### Stage 2 -- Terraform Init
 
-    environment {
-        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-    }
+Initializes backend, downloads providers and modules.
 
-    options {
-        timestamps()
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-    }
+### Stage 3 -- Validate
 
-    stages {
+Validates Terraform syntax and configuration.
 
-        stage('Checkout') {
-            steps {
-                cleanWs()
-                checkout scm
-            }
-        }
+### Stage 4 -- Plan
 
-        stage('Terraform Init') {
-            steps {
-                sh 'terraform init -input=false'
-            }
-        }
+Generates execution plan and stores as artifact.
 
-        stage('Terraform Validate') {
-            steps {
-                sh 'terraform validate'
-            }
-        }
+### Stage 5 -- Approval Gate
 
-        stage('Terraform Plan') {
-            when {
-                expression { params.action == 'apply' }
-            }
-            steps {
-                sh 'terraform plan -out=tfplan'
-                sh 'terraform show -no-color tfplan > tfplan.txt'
-            }
-        }
+Manual enterprise approval before infrastructure modification.
 
-        stage('Approval') {
-            when {
-                allOf {
-                    expression { params.action == 'apply' }
-                    expression { !params.autoApprove }
-                }
-            }
-            steps {
-                script {
-                    def plan = readFile 'tfplan.txt'
-                    input message: "Approve Terraform Plan?",
-                          parameters: [text(name: 'Plan', defaultValue: plan)]
-                }
-            }
-        }
+### Stage 6 -- Apply / Destroy
 
-        stage('Apply / Destroy') {
-            steps {
-                script {
-                    if (params.action == 'apply') {
-                        sh 'terraform apply -input=false tfplan'
-                    } else if (params.action == 'destroy') {
-                        sh 'terraform destroy --auto-approve'
-                    } else {
-                        error "Invalid action selected."
-                    }
-                }
-            }
-        }
-    }
+-   Apply approved plan
+-   OR controlled infrastructure destroy
 
-    post {
-        success {
-            echo "✅ Infrastructure operation completed successfully."
-        }
-        failure {
-            echo "❌ Terraform deployment failed."
-        }
-    }
-}
+------------------------------------------------------------------------
+
+## 🏛 Enterprise Features
+
+-   ✅ Manual Approval Gates\
+-   ✅ Secure Credential Handling\
+-   ✅ Artifact Archiving\
+-   ✅ Controlled Destroy Workflow\
+-   ✅ Modular Architecture\
+-   ✅ Version-Locked Providers
+
+------------------------------------------------------------------------
+
+## 🔄 Animated CI/CD Pipeline Visualization
+
+```{=html}
+<p align="center">
+```
+`<img src="Terraform-Jenkins-Animated-Pipeline.svg" width="100%"/>`{=html}
+```{=html}
+</p>
 ```
 
 ------------------------------------------------------------------------
 
-# ☁️ AWS Infrastructure Provisioned
+## 🧠 CI/CD Maturity Model
 
--   VPC\
--   Public & Private Subnets\
--   NAT Gateway\
--   IAM Roles & Policies\
--   Security Groups\
--   KMS Encryption\
--   EKS Cluster
-
-------------------------------------------------------------------------
-
-# 🔐 Security Best Practices
-
--   Credentials stored in Jenkins\
--   No secrets in GitHub\
--   Manual approval gate\
--   Controlled destroy capability\
--   Terraform state locking\
--   Provider version constraints
+  Level     Description
+  --------- ------------------------------------
+  Level 1   Manual Infrastructure
+  Level 2   Automated Plan
+  Level 3   Approval-Based Apply
+  Level 4   Full Lifecycle Automation
+  Level 5   Enterprise Governance & Compliance
 
 ------------------------------------------------------------------------
 
-# 📊 CI/CD Maturity Alignment
+## 👨‍💻 Author
 
-✔ Infrastructure as Code\
-✔ Automated Plan\
-✔ Manual Governance Gate\
-✔ Automated Apply\
-✔ Controlled Destroy\
-✔ Modular Architecture
-
-------------------------------------------------------------------------
-
-# 🚀 Key Achievements
-
--   Designed enterprise Terraform pipeline\
--   Provisioned AWS EKS environment\
--   Implemented approval governance\
--   Automated full infrastructure lifecycle
-
-------------------------------------------------------------------------
-
-# 👨‍💻 Author
-
-Avik Banerjee\
+**Avik Banerjee**\
 Cloud \| DevOps \| Infrastructure Automation Engineer
-
-------------------------------------------------------------------------
-
-# 🔄 Animated CI/CD Pipeline Visualization
-
-Below is the fully animated Terraform + Jenkins pipeline diagram:
-
-![Animated Terraform Jenkins
-Pipeline](Terraform-Jenkins-Animated-Pipeline.svg)
-
-> ⚙️ This SVG includes animated flow arrows and enterprise workflow
-> visualization.
->
-> Recommended: Keep the SVG file in the same repository root for proper
-> rendering on GitHub.
-
-------------------------------------------------------------------------
