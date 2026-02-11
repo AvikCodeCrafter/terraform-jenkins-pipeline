@@ -2,56 +2,93 @@ pipeline {
 
     agent any
 
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
     parameters {
         booleanParam(
             name: 'autoApprove',
             defaultValue: false,
-            description: 'Automatically run apply after generating plan?'
+            description: 'Automatically run terraform apply?'
         )
     }
 
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_DEFAULT_REGION    = 'us-east-1'
     }
 
     stages {
 
-        stage('Plan') {
+        stage('Checkout') {
             steps {
-                dir('terraform') {
-                    sh 'terraform init'
-                    sh 'terraform plan -out=tfplan'
-                    sh 'terraform show -no-color tfplan > tfplan.txt'
-                }
+                cleanWs()
+                checkout scm
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh '''
+                    terraform --version
+                    terraform init -input=false
+                '''
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                sh 'terraform validate'
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                sh '''
+                    terraform plan -out=tfplan
+                    terraform show -no-color tfplan > tfplan.txt
+                '''
             }
         }
 
         stage('Approval') {
             when {
-                not { equals expected: true, actual: params.autoApprove }
+                expression { return !params.autoApprove }
             }
             steps {
                 script {
-                    def plan = readFile 'terraform/tfplan.txt'
-                    input message: "Do you want to apply the plan?",
+                    def plan = readFile('tfplan.txt')
+                    input message: "Approve Terraform Apply?",
                           parameters: [
-                              text(
-                                  name: 'Terraform Plan',
-                                  description: 'Review the plan output',
-                                  defaultValue: plan
-                              )
+                              text(name: 'Terraform Plan',
+                                   defaultValue: plan,
+                                   description: 'Review the plan before applying')
                           ]
                 }
             }
         }
 
-        stage('Apply') {
+        stage('Terraform Apply') {
             steps {
-                dir('terraform') {
-                    sh 'terraform apply -input=false tfplan'
-                }
+                sh 'terraform apply -input=false tfplan'
             }
+        }
+
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'tfplan.txt', fingerprint: true
+        }
+        success {
+            echo "✅ Infrastructure deployed successfully!"
+        }
+        failure {
+            echo "❌ Terraform deployment failed!"
         }
     }
 }
