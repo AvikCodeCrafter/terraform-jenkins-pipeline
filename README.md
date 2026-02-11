@@ -32,10 +32,6 @@ It automates the complete AWS infrastructure lifecycle:
 
 ![Terraform Jenkins Pipeline Tech-Stack](image.png)
 
-`Terraform-Jenkins-Animated-Pipeline.svg`
-
-![Terraform Jenkins Pipeline](Terraform-Jenkins-Animated-Pipeline.svg)
-
 ------------------------------------------------------------------------
 
 ## 🔹 End-to-End Workflow
