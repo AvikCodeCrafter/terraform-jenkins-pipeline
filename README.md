@@ -1,108 +1,110 @@
 # 🚀 Enterprise Infrastructure Automation
 
-```{=html}
-<p align="center">
-```
-`<img src="https://img.shields.io/badge/Terraform-v1.14-623CE4?style=for-the-badge&logo=terraform&logoColor=white"/>`{=html}
-`<img src="https://img.shields.io/badge/Jenkins-Pipeline-D24939?style=for-the-badge&logo=jenkins&logoColor=white"/>`{=html}
-`<img src="https://img.shields.io/badge/AWS-EKS%20%7C%20VPC-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white"/>`{=html}
-`<img src="https://img.shields.io/badge/Infrastructure-as--Code-Enterprise-blue?style=for-the-badge"/>`{=html}
-```{=html}
-</p>
-```
+## Terraform + Jenkins CI/CD Pipeline on AWS
+
+![Terraform](https://img.shields.io/badge/Terraform-v1.14-623CE4?style=for-the-badge&logo=terraform&logoColor=white)
+![Jenkins](https://img.shields.io/badge/Jenkins-Pipeline-D24939?style=for-the-badge&logo=jenkins&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-EKS%20%7C%20VPC-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![IaC](https://img.shields.io/badge/Infrastructure-as--Code-Enterprise-blue?style=for-the-badge)
 
 ------------------------------------------------------------------------
 
 ## 📌 Project Overview
 
-Enterprise-grade Infrastructure Automation pipeline using **Terraform +
-Jenkins** to provision and manage AWS infrastructure.
+This project demonstrates a production-grade Infrastructure as Code
+(IaC) pipeline using:
 
-This project demonstrates:
+-   🔹 Terraform (modular infrastructure provisioning)
+-   🔹 Jenkins (CI/CD orchestration)
+-   🔹 AWS (EKS, VPC, IAM, Security Groups)
+-   🔹 Enterprise approval & governance workflow
 
--   Modular Terraform architecture
--   Secure AWS credential injection via Jenkins
--   Automated `init → validate → plan`
--   Manual approval gates
--   Controlled `apply / destroy`
--   Full infrastructure lifecycle automation
+It automates the complete AWS infrastructure lifecycle:
+
+✔ Plan\
+✔ Manual Approval\
+✔ Apply\
+✔ Controlled Destroy
 
 ------------------------------------------------------------------------
 
 ## 🏗 Architecture Overview
 
-**Layers:**
+Ensure the animated SVG file exists in the root of your repository:
 
-1.  **Source Control** -- GitHub repository
-2.  **CI/CD Engine** -- Jenkins Declarative Pipeline
-3.  **Infrastructure as Code** -- Terraform Modules
-4.  **Cloud Platform** -- AWS (VPC, EKS, IAM, Security Groups)
-5.  **State & Governance** -- Terraform state management + approval
-    workflow
+`Terraform-Jenkins-Animated-Pipeline.svg`
+
+![Terraform Jenkins Pipeline](Terraform-Jenkins-Animated-Pipeline.svg)
 
 ------------------------------------------------------------------------
 
-## 🔄 CI/CD Workflow
+## 🔹 End-to-End Workflow
 
-### Stage 1 -- Checkout
-
-Jenkins pulls latest Terraform code from GitHub.
-
-### Stage 2 -- Terraform Init
-
-Initializes backend, downloads providers and modules.
-
-### Stage 3 -- Validate
-
-Validates Terraform syntax and configuration.
-
-### Stage 4 -- Plan
-
-Generates execution plan and stores as artifact.
-
-### Stage 5 -- Approval Gate
-
-Manual enterprise approval before infrastructure modification.
-
-### Stage 6 -- Apply / Destroy
-
--   Apply approved plan
--   OR controlled infrastructure destroy
+1️⃣ Developer pushes Terraform code to GitHub\
+2️⃣ Jenkins pipeline triggers\
+3️⃣ Terraform initializes backend & providers\
+4️⃣ Plan is generated and archived\
+5️⃣ Manual approval gate enforces governance\
+6️⃣ Terraform Apply provisions infrastructure\
+7️⃣ Optional Destroy stage removes resources safely
 
 ------------------------------------------------------------------------
 
-## 🏛 Enterprise Features
+## 🧱 Infrastructure Components Provisioned
 
--   ✅ Manual Approval Gates\
--   ✅ Secure Credential Handling\
--   ✅ Artifact Archiving\
--   ✅ Controlled Destroy Workflow\
--   ✅ Modular Architecture\
--   ✅ Version-Locked Providers
-
-------------------------------------------------------------------------
-
-## 🔄 Animated CI/CD Pipeline Visualization
-
-```{=html}
-<p align="center">
-```
-`<img src="Terraform-Jenkins-Animated-Pipeline.svg" width="100%"/>`{=html}
-```{=html}
-</p>
-```
+-   ✅ VPC (Public & Private Subnets)
+-   ✅ NAT Gateway
+-   ✅ Internet Gateway
+-   ✅ Security Groups
+-   ✅ IAM Roles & Policies
+-   ✅ KMS Encryption
+-   ✅ Amazon EKS Cluster
+-   ✅ Managed Node Groups
 
 ------------------------------------------------------------------------
 
-## 🧠 CI/CD Maturity Model
+## 🔐 Enterprise Governance Controls
 
-  Level     Description
-  --------- ------------------------------------
-  Level 1   Manual Infrastructure
-  Level 2   Automated Plan
-  Level 3   Approval-Based Apply
-  Level 4   Full Lifecycle Automation
-  Level 5   Enterprise Governance & Compliance
+-   🔒 Manual approval before Apply
+-   🔒 Parameterized action (apply / destroy)
+-   🔒 Secure AWS credentials in Jenkins
+-   🔒 Terraform state locking
+-   🔒 Modular Terraform architecture
+-   🔒 Version-pinned providers
+
+------------------------------------------------------------------------
+
+## 🧩 Pipeline Capabilities
+
+-   Workspace cleanup
+-   Secure credential injection
+-   Terraform validation
+-   Plan artifact archiving
+-   Approval-based promotion
+-   Controlled destroy mechanism
+-   Failure handling & post-stage reporting
+
+------------------------------------------------------------------------
+
+## 📊 CI/CD Maturity Alignment
+
+  Level     Capability                          Status
+  --------- ----------------------------------- --------
+  Level 1   Scripted IaC                        ✅
+  Level 2   CI Validation                       ✅
+  Level 3   Approval Governance                 ✅
+  Level 4   Modular Infrastructure              ✅
+  Level 5   Enterprise Pipeline Orchestration   ✅
+
+------------------------------------------------------------------------
+
+## 🚀 Key Achievements
+
+-   Designed enterprise-grade Terraform pipeline\
+-   Provisioned secure AWS EKS infrastructure\
+-   Implemented approval-based governance\
+-   Automated full infrastructure lifecycle\
+-   Integrated CI/CD with Infrastructure as Code
 
 ------------------------------------------------------------------------
 
@@ -110,3 +112,11 @@ Manual enterprise approval before infrastructure modification.
 
 **Avik Banerjee**\
 Cloud \| DevOps \| Infrastructure Automation Engineer
+
+------------------------------------------------------------------------
+
+## ⭐ Resume Highlight
+
+Built and deployed an enterprise-grade Infrastructure Automation
+pipeline using Terraform and Jenkins, enabling governed, modular, and
+fully automated provisioning of AWS EKS environments.
