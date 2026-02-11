@@ -1,10 +1,32 @@
-# 🚀 Terraform + Jenkins Enterprise CI/CD Pipeline
+# 🚀 Terraform + Jenkins Enterprise Pipeline (Dynamic Badges)
 
-![Terraform](https://img.shields.io/badge/Terraform-IaC-623CE4?logo=terraform&logoColor=white)
-![Jenkins](https://img.shields.io/badge/Jenkins-CI%2FCD-D24939?logo=jenkins&logoColor=white)
-![AWS](https://img.shields.io/badge/AWS-Cloud-232F3E?logo=amazonaws&logoColor=white)
-![EKS](https://img.shields.io/badge/Amazon-EKS-FF9900?logo=amazonaws&logoColor=white)
-![Enterprise](https://img.shields.io/badge/Enterprise-Grade-success)
+![Build
+Status](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge&logo=jenkins)
+![Terraform](https://img.shields.io/badge/Terraform-v1.14-623CE4?style=for-the-badge&logo=terraform)
+![AWS](https://img.shields.io/badge/AWS-EKS%20Cluster-FF9900?style=for-the-badge&logo=amazonaws)
+![Pipeline](https://img.shields.io/badge/Pipeline-Enterprise-blue?style=for-the-badge)
+![Last
+Commit](https://img.shields.io/github/last-commit/your-org/your-repo?style=for-the-badge)
+![Repo
+Size](https://img.shields.io/github/repo-size/your-org/your-repo?style=for-the-badge)
+![Stars](https://img.shields.io/github/stars/your-org/your-repo?style=for-the-badge)
+
+------------------------------------------------------------------------
+
+## 📊 Live Counters
+
+![Workflow
+Runs](https://img.shields.io/github/actions/workflow/status/your-org/your-repo/ci.yml?style=for-the-badge)
+![Issues](https://img.shields.io/github/issues/your-org/your-repo?style=for-the-badge)
+![Pull
+Requests](https://img.shields.io/github/issues-pr/your-org/your-repo?style=for-the-badge)
+
+------------------------------------------------------------------------
+
+## 🏗 Dynamic CI/CD Architecture
+
+Developer → GitHub → Jenkins → Terraform → AWS (VPC + EKS)
+
 
 ------------------------------------------------------------------------
 
