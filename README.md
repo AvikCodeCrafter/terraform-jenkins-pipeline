@@ -30,7 +30,7 @@ It automates the complete AWS infrastructure lifecycle:
 
 ## 🏗 Architecture Overview
 
-Ensure the animated SVG file exists in the root of your repository:
+![Terraform Jenkins Pipeline Tech-Stack](image.svg)
 
 `Terraform-Jenkins-Animated-Pipeline.svg`
 
